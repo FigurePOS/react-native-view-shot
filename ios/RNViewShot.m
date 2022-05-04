@@ -24,7 +24,7 @@ RCT_EXPORT_MODULE()
 
 RCT_EXPORT_METHOD(captureScreen: (NSDictionary *)options
                   resolve:(RCTPromiseResolveBlock)resolve
-                  reject:(RCTPromiseRejectBlock)reject) 
+                  reject:(RCTPromiseRejectBlock)reject)
 {
   [self captureRef: [NSNumber numberWithInt:-1] withOptions:options resolve:resolve reject:reject];
 }
@@ -53,7 +53,9 @@ RCT_EXPORT_METHOD(captureRef:(nonnull NSNumber *)target
 
     if ([target intValue] == -1) {
       UIWindow *window = [[UIApplication sharedApplication] keyWindow];
-      view = window.rootViewController.view;
+      // Use 'window' as the root view instead of window.rootViewController.view in order to capture also modals
+      // https://github.com/gre/react-native-view-shot/issues/308#issuecomment-1116119843
+      view = window;
     } else {
       view = viewRegistry[target];
     }
@@ -107,7 +109,7 @@ RCT_EXPORT_METHOD(captureRef:(nonnull NSNumber *)target
     }
 
     UIGraphicsBeginImageContextWithOptions(size, NO, 0);
-    
+
     if (renderInContext) {
       // this comes with some trade-offs such as inability to capture gradients or scrollview's content in full but it works for large views
       [rendered.layer renderInContext: UIGraphicsGetCurrentContext()];
